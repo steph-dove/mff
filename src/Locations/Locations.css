@@ -1,0 +1,5 @@
+.scrollable-container {
+    width: 500px; /* Set the width of the container */
+    height: 600px; /* Set the maximum height of the container */
+    overflow-y: auto; /* Enable vertical scrolling */
+  }
