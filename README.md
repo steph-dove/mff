@@ -44,7 +44,7 @@ Creates a sqlite database, makes a request to https://data.sfgov.org/resource/rq
 
 Starts the server on :8000
 
-### `npm start-client`
+### `react-scripts start`
 
 Runs the app in the development mode.\
 Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
