@@ -1,6 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { LocationContext } from '../LocationProvider/LocationContext';
-import debounce from 'lodash.debounce';
+import { LocationContext } from '../LocationProvider/LocationContext.js';
 import './Form.css';
 
 function Form() {
@@ -10,7 +9,9 @@ function Form() {
 
     const [formData, setFormData] = useState({
         name: '',
-        address: ''
+        address: '',
+        latitude: '',
+        longitude: '',
     });
 
     const handleChangeApp = (e) => {
@@ -46,6 +47,7 @@ function Form() {
             name="name"
             value={formData.name}
             onChange={handleChangeApp}
+            autoComplete="off"
             />
         </div>
         <div>
@@ -56,6 +58,7 @@ function Form() {
             name="address"
             value={formData.address}
             onChange={handleChangeAdd}
+            autoComplete="off"
             />
         </div>
         <div>

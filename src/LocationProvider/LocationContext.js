@@ -11,6 +11,7 @@ const LocationProvider = ({ children }) => {
     const [status, setStatus] = useState('approved');
     const [applicant, setApplicant] = useState('');
     const [address, setAddress] = useState('');
+    const [latLng, setLatLng] = useState({ lat: 37.773972, lng: -122.431297 });
 
     const updateActiveLocation = (locationId) => {
         setActiveLocation(locationId);
@@ -35,6 +36,10 @@ const LocationProvider = ({ children }) => {
         }
     }
 
+    const updateLatLng = () => {
+        setLatLng({ lat: map.getCenter().lat(), lng: map.getCenter().lng() });
+    }
+
     const updateMapCenter = (latitude, longitude) => {
         console.log('updateMapCenter:', latitude, longitude)
         map.setCenter({ lat: parseFloat(latitude), lng: parseFloat(longitude) });
@@ -44,14 +49,14 @@ const LocationProvider = ({ children }) => {
 
     useEffect(() => {
         console.log('Fetching locations with status:', status, applicant, address);
-        axios.get(`http://localhost:8000/api/locations?status=${status}&applicant=${applicant}&address=${address}`)
+        axios.get(`http://localhost:8000/api/locations?status=${status}&applicant=${applicant}&address=${address}&lat=${latLng.lat}&lng=${latLng.lng}`)
         .then(response => {
             setLocations(response.data);
         })
         .catch(error => {
             console.error('Error fetching locations:', error);
         });
-    }, [status,applicant,address]);
+    }, [status,applicant,address,latLng]);
 
     return (
         <LocationContext.Provider value={{
@@ -66,6 +71,7 @@ const LocationProvider = ({ children }) => {
             updateStatus,
             updateAddress,
             updateApplicant,
+            updateLatLng,
             }}>
           {children}
         </LocationContext.Provider>
@@ -80,3 +86,15 @@ function safeString(str) {
     const regex = /^[a-zA-Z0-9]+$/;
     return regex.test(str);
   }
+  
+// get 5 mile radius from center of map
+function calculateBounds(centerLat, centerLng) {
+    const bounds = {
+        north: centerLat + (5 / 6371) * (180 / Math.PI),
+        south: centerLat - (5 / 6371) * (180 / Math.PI),
+        east: centerLng + (5 / 6371) * (180 / Math.PI) / Math.cos(centerLat * Math.PI/180),
+        west: centerLng - (5 / 6371) * (180 / Math.PI) / Math.cos(centerLat * Math.PI/180)
+    };
+    return bounds;
+}
+  

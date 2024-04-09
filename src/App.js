@@ -1,8 +1,8 @@
 import './App.css';
-import Form from './Form/Form';
-import Map from './Map/Map';
-import Locations from './Locations/Locations';
-import { LocationProvider } from './LocationProvider/LocationContext';
+import Form from './Form/Form.js';
+import Map from './Map/Map.js';
+import Locations from './Locations/Locations.js';
+import { LocationProvider } from './LocationProvider/LocationContext.js';
 
 function App() {
   return (

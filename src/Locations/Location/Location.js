@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { LocationContext } from '../../LocationProvider/LocationContext';
+import { LocationContext } from '../../LocationProvider/LocationContext.js';
 import './Location.css';
 
 const Location = ({ element }) => {
@@ -13,7 +13,7 @@ const Location = ({ element }) => {
     return (
         <div className="location" onClick={() => onClick(element)}>
             <div className="data-item">
-                <span className="label">Location ID:</span> {element.locationid}
+                <span className="label">Location ID:</span> {element.objectid}
             </div>
             <div className="data-item">
                 <span className="label">Applicant:</span> {element.applicant}

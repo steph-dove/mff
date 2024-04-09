@@ -24,6 +24,9 @@ app.get('/api/locations', (req, res) => {
     // parse address query parameter
     let address = req.query && req.query.address || '';
 
+    let lat = req.query && req.query.lat || '';
+    let lng = req.query && req.query.lng || '';
+
     // Open the SQLite database
     const db = new sqlite3.Database(DB_FILE_PATH, (err) => {
         if (err) {
@@ -33,7 +36,7 @@ app.get('/api/locations', (req, res) => {
             console.log('Connected to the SQLite database.', status, applicant, address);
         
             // build the SQL query
-            const query = buildQuery(status, applicant, address);
+            const query = buildQuery(status, applicant, address, lat, lng);
             // Query the locations table
             db.all(query, (err, rows) => {
                 if (err) {
@@ -91,19 +94,32 @@ app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
 
-const buildQuery = (status, applicant, address) => {
-    let query = `SELECT * FROM locations WHERE status = 'APPROVED'`;
-    if (status) {
-        query = `SELECT * FROM locations WHERE status = '${status}'`;
+const buildQuery = (status, applicant, address, lat, lng) => {
+    let query = `SELECT *`;
+    if (lat && lng) {
+        query += `, (6371 * acos(cos(radians(${lat})) * cos(radians(latitude)) * cos(radians(longitude) - radians(${lng})) + sin(radians(${lat})) * sin(radians(latitude)))) AS distance`;
     }
     if (status === 'ALL') {
-        query = `SELECT * FROM locations`;
+        query += ` FROM locations WHERE status IN ('APPROVED', 'DENIED', 'REQUESTED', 'SUSPEND', 'EXPIRED', 'ISSUED')`;
+    } else {
+        query += ` FROM locations WHERE status = '${status || 'APPROVED'}'`;
     }
-    if (applicant) {
-        query += ` AND applicant LIKE '${applicant}'`;
+    if (applicant && safeString(applicant)) {
+        query += ` AND applicant LIKE '%${applicant}%' COLLATE NOCASE`;
     }
-    if (address) {
-        query += ` AND address LIKE '${address}'`;
+    if (address && safeString(address)) {
+        query += ` AND address LIKE '%${address}%' COLLATE NOCASE`;
+    }
+    if (lat && lng) {
+        query += ` ORDER BY distance 
+        LIMIT 5`;
     }
     return query;
 }
+
+
+function safeString(str) {
+    // Regular expression to match only alphabet characters or numbers
+    const regex = /^[a-zA-Z0-9]+$/;
+    return regex.test(str);
+  }

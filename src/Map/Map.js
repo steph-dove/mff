@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react'
 import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from '@react-google-maps/api';
-import { LocationContext } from '../LocationProvider/LocationContext';
+import { LocationContext } from '../LocationProvider/LocationContext.js';
 import './Map.css';
 
 const containerStyle = {
@@ -16,7 +16,7 @@ function Map() {
   })
 
   const [activeMarker, setActiveMarker] = useState(null);
-  const { setMap, mapCenter } = useContext(LocationContext);
+  const { setMap, mapCenter, updateLatLng } = useContext(LocationContext);
 
   const onLoad = React.useCallback(function callback(map) {
     const bounds = new window.google.maps.LatLngBounds({
@@ -41,6 +41,10 @@ function Map() {
     setActiveMarker(marker);
   };
 
+  const onDragEnd = () => {
+    updateLatLng();
+  };
+
   const getInfoWindow = (location) => {
     if (activeMarker === location.locationid) {
       return (
@@ -60,6 +64,7 @@ function Map() {
             zoom={13}
             onLoad={onLoad}
             onUnmount={onUnmount}
+            onDragEnd={onDragEnd}
         >
             {locations.map(location =>  {
               const myLatlng = new google.maps.LatLng(parseFloat(location.latitude),parseFloat(location.longitude));
